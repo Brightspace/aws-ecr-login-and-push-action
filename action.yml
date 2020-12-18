@@ -1,0 +1,39 @@
+name: 'AWS ECR Login & Push'
+description: 'Pushes a docker image to an ECR repository'
+inputs:
+
+  aws-account-id:
+    description: 'The account of ECR repository'
+    required: true
+
+  aws-region:
+    description: 'The region of ECR repository'
+    required: true
+
+  ecr-repository:
+    description: 'The repository name'
+    required: true
+
+  ecr-image-tag:
+    description: 'The docker image tag'
+    required: true
+
+  source-image:
+    description: 'The source image to push'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+      - name: Log into ECR
+        shell: bash
+        run: aws ecr get-login-password --region "${{ inputs.aws-region }}" | docker login --username AWS --password-stdin "${{ inputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com"
+
+      - name: Docker tag
+        shell: bash
+        run: docker tag "${{ inputs.source-image }}" "${{ inputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-repository }}:${{ inputs.ecr-image-tag }}"
+
+      - name: Docker push
+        shell: bash
+        run: docker push "${{ inputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-repository }}:${{ inputs.ecr-image-tag }}"
