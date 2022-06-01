@@ -32,8 +32,12 @@ runs:
 
       - name: Docker tag
         shell: bash
-        run: docker tag "${{ inputs.source-image }}" "${{ inputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-repository }}:${{ inputs.ecr-image-tag }}"
+        run: docker tag "${{ inputs.source-image }}" "${IMAGE,,}:${{ inputs.ecr-image-tag }}"
+        env:
+          IMAGE: ${{ inputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-repository }}
 
       - name: Docker push
         shell: bash
-        run: docker push "${{ inputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-repository }}:${{ inputs.ecr-image-tag }}"
+        run: docker push "${IMAGE,,}:${{ inputs.ecr-image-tag }}"
+        env:
+          IMAGE: ${{ inputs.aws-account-id }}.dkr.ecr.${{ inputs.aws-region }}.amazonaws.com/${{ inputs.ecr-repository }}
